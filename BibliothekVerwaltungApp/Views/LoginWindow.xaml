@@ -1,0 +1,83 @@
+﻿<Window x:Class="BibliothekVerwaltungApp.Views.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Anmeldung"
+        SizeToContent="WidthAndHeight"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen">
+
+    <Border Padding="20" Background="#FFF" CornerRadius="8">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="200" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Überschrift -->
+            <TextBlock Grid.Row="0"
+                       Grid.ColumnSpan="3"
+                       Text="Bibliothek – Anmeldung"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       Margin="0,0,0,15" />
+
+            <!-- Benutzername -->
+            <TextBlock Grid.Row="1"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       Text="Benutzername:" />
+            <TextBox Grid.Row="1"
+                     Grid.Column="2"
+                     MinWidth="180"
+                     Margin="0,0,0,5"
+                     Text="{Binding Benutzername, UpdateSourceTrigger=PropertyChanged}" />
+
+            <!-- Passwort -->
+            <!-- Hinweis: hier aus Einfachheitsgründen TextBox statt echter PasswordBox -->
+            <TextBlock Grid.Row="2"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       Text="Passwort:" />
+            <TextBox Grid.Row="2"
+                     Grid.Column="2"
+                     MinWidth="180"
+                     Margin="0,0,0,5"
+                     Text="{Binding Passwort, UpdateSourceTrigger=PropertyChanged}" />
+
+            <!-- Fehlermeldung -->
+            <TextBlock Grid.Row="3"
+                       Grid.ColumnSpan="3"
+                       Margin="0,5,0,5"
+                       Foreground="Red"
+                       Text="{Binding Fehlermeldung}" />
+
+            <!-- Buttons -->
+            <StackPanel Grid.Row="4"
+                        Grid.ColumnSpan="3"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Margin="0,10,0,0">
+                <Button Content="Anmelden"
+                        Width="90"
+                        Margin="0,0,10,0"
+                        IsDefault="True"
+                        Command="{Binding AnmeldenCommand}" />
+                <Button Content="Abbrechen"
+                        Width="90"
+                        IsCancel="True"
+                        Command="{Binding AbbrechenCommand}" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

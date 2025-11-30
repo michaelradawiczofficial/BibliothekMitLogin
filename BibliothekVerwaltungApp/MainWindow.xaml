@@ -1,0 +1,603 @@
+﻿<Window x:Class="BibliothekVerwaltungApp.MainWindow" 
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BibliothekVerwaltungApp"
+        mc:Ignorable="d"
+        Title="Bibliothek Verwaltung"
+        Height="600"
+        Width="1000"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Linke Seite: Aktionen + Tabs -->
+        <GroupBox Header="Aktionen" Grid.Column="0" Padding="10">
+            <DockPanel>
+
+                <!-- NEU: Button für Benutzerverwaltung (nur Admin sieht ihn) -->
+                <StackPanel Orientation="Horizontal"
+                            DockPanel.Dock="Top"
+                            HorizontalAlignment="Right"
+                            Margin="0,0,0,10">
+                    <Button Content="Benutzerverwaltung"
+                            Padding="10,2"
+                            Command="{Binding OpenUserManagementCommand}">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <!-- Wenn kein Admin: Button ausblenden -->
+                                    <DataTrigger Binding="{Binding IstAdmin}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+
+                <!-- Tabs für Suche / Hinzufügen / Entfernen -->
+                <TabControl>
+                    <!-- TAB: Suche -->
+                    <TabItem Header="Suche">
+                        <StackPanel Margin="5" VerticalAlignment="Top">
+                            <TextBlock Text="Suchbegriff:" Margin="0,0,0,5" />
+                            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,10" />
+
+                            <TextBlock Margin="0,0,0,5"
+                                       FontStyle="Italic"
+                                       Foreground="Gray"
+                                       TextWrapping="Wrap">
+                                Suche in Titel, Autor/Regisseur/Hersteller und ID.
+                            </TextBlock>
+
+                            <Button Content="Felder leeren"
+                                    Margin="0,15,0,0"
+                                    Width="140"
+                                    HorizontalAlignment="Left"
+                                    Command="{Binding ClearSearchCommand}" />
+                        </StackPanel>
+                    </TabItem>
+
+                    <!-- TAB: Hinzufügen (nur Bibliothekar / Admin) -->
+                    <TabItem Header="Hinzufügen">
+                        <TabItem.Style>
+                            <Style TargetType="TabItem">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentUserRole}"
+                                                 Value="Gast">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TabItem.Style>
+
+                        <StackPanel Margin="5" VerticalAlignment="Top">
+                            <TextBlock Text="Medientyp:" Margin="0,0,0,5" />
+                            <ComboBox ItemsSource="{Binding MediaTypes}"
+                                      SelectedItem="{Binding SelectedMediaType}"
+                                      Margin="0,0,0,10"
+                                      Width="200" />
+
+                            <TextBlock Text="Titel:" Margin="0,0,0,5" />
+                            <TextBox Text="{Binding NeuerTitel}"
+                                     Margin="0,0,0,10" />
+
+                            <TextBlock Text="Autor / Regisseur / Hersteller:" Margin="0,0,0,5" />
+                            <TextBox Text="{Binding NeuerAutor}"
+                                     Margin="0,0,0,10" />
+
+                            <!-- Zusatz-Label ändert sich je nach Medientyp -->
+                            <TextBlock Margin="0,0,0,5">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="Zusatz:"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedMediaType}" Value="Buch">
+                                                <Setter Property="Text" Value="Verlag:"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding SelectedMediaType}" Value="DVD">
+                                                <Setter Property="Text" Value="Dauer (Minuten):"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding SelectedMediaType}" Value="Software">
+                                                <Setter Property="Text" Value="Betriebssystem:"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+
+                            <TextBox Text="{Binding Zusatz1}"
+                                     Margin="0,0,0,10" />
+
+                            <TextBlock Text="ID:" Margin="0,0,0,5" />
+                            <!-- ID wird automatisch generiert -> nur anzeigen, nicht bearbeitbar -->
+                            <TextBox Text="{Binding NeueId, Mode=OneWay}"
+                                     IsReadOnly="True"
+                                     Margin="0,0,0,10" />
+
+                            <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
+                                <Button Content="Hinzufügen"
+                                        Width="120"
+                                        Margin="0,0,10,0"
+                                        Command="{Binding HinzufuegenCommand}" />
+                                <Button Content="Felder leeren"
+                                        Width="120"
+                                        Command="{Binding ClearAddFieldsCommand}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </TabItem>
+
+                    <!-- TAB: Entfernen (nur Bibliothekar / Admin) -->
+                    <TabItem Header="Entfernen">
+                        <TabItem.Style>
+                            <Style TargetType="TabItem">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentUserRole}"
+                                                 Value="Gast">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TabItem.Style>
+
+                        <StackPanel Margin="5" VerticalAlignment="Top">
+
+                            <TextBlock Text="Medium zum Entfernen suchen:"
+                                       Margin="0,0,0,5" />
+
+                            <!-- Suchfeld mit Live-Suche – filtert die Listen rechts -->
+                            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,10"
+                                     ToolTip="Suche in Titel, Autor/Regisseur/Hersteller und ID." />
+
+                            <TextBlock Text="Wähle das Medium anschließend in einer der Listen rechts aus und klicke auf 'Entfernen'."
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,10" />
+
+                            <TextBlock Text="Nur nicht verliehene Medien können entfernt werden."
+                                       FontStyle="Italic"
+                                       Foreground="Gray"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,10" />
+
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <Button Content="Entfernen"
+                                        Width="120"
+                                        Margin="0,0,10,0"
+                                        Command="{Binding EntfernenCommand}" />
+
+                                <Button Content="Auswahl löschen"
+                                        Width="120"
+                                        Command="{Binding ClearRemoveSelectionCommand}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </TabItem>
+
+                </TabControl>
+            </DockPanel>
+        </GroupBox>
+
+        <!-- Abstandsspalte -->
+        <GridSplitter Grid.Column="1"
+                      Width="5"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Stretch"
+                      ResizeBehavior="PreviousAndNext"
+                      ShowsPreview="True" />
+
+        <!-- Rechte Seite: Medienübersicht -->
+        <GroupBox Header="Medienübersicht" Grid.Column="2" Padding="10">
+            <TabControl>
+                <!-- TAB: Alle Medien -->
+                <TabItem Header="Alle Medien">
+                    <DataGrid ItemsSource="{Binding GefilterteMedien}"
+                              SelectedItem="{Binding SelectedMediumToRemove, Mode=TwoWay}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              CanUserAddRows="False"
+                              Margin="0,5,0,0">
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="Background" Value="White"/>
+                                <Style.Triggers>
+                                    <!-- verliehen = rötlich -->
+                                    <DataTrigger Binding="{Binding IstVerliehen}" Value="True">
+                                        <Setter Property="Background" Value="#FFFFC0C0"/>
+                                    </DataTrigger>
+                                    <!-- reserviert = gelblich -->
+                                    <DataTrigger Binding="{Binding IstReserviert}" Value="True">
+                                        <Setter Property="Background" Value="#FFFFFFC0"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Titel" Binding="{Binding Titel}" Width="*" />
+                            <DataGridTextColumn Header="Autor/Regisseur/Hersteller" Binding="{Binding AutorRegisseurHersteller}" Width="2*" />
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="*" />
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*" />
+
+                            <!-- Nur Bibliothekar/Admin sieht diese Infos -->
+                            <DataGridTextColumn Header="Verliehen an" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Setter Property="Text" Value="{Binding VerliehenAn}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Value="True"
+                                                         Binding="{Binding DataContext.IsBibliothekar,
+                                                                           RelativeSource={RelativeSource AncestorType=Window}}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <DataGridTextColumn Header="Verliehen am" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Setter Property="Text"
+                                                Value="{Binding VerliehenAm, StringFormat={}{0:dd.MM.yyyy HH:mm}}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Value="True"
+                                                         Binding="{Binding DataContext.IsBibliothekar,
+                                                                           RelativeSource={RelativeSource AncestorType=Window}}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Aktionen -->
+                            <DataGridTemplateColumn Header="Aktionen" Width="2*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Content="Verleihen / Zurück"
+                                                    Margin="0,0,5,0"
+                                                    Padding="5,0"
+                                                    Command="{Binding DataContext.ToggleVerliehenCommand,
+                                                                      RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding DataContext.CurrentUserRole,
+                                                                                             RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                         Value="Gast">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+
+                                            <Button Content="Reservieren / Freigeben"
+                                                    Padding="5,0"
+                                                    Command="{Binding DataContext.ToggleReserviertCommand,
+                                                                      RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+
+                <!-- TAB: Bücher -->
+                <TabItem Header="Bücher">
+                    <DataGrid ItemsSource="{Binding GefilterteBuecher}"
+                              SelectedItem="{Binding SelectedMediumToRemove, Mode=TwoWay}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              CanUserAddRows="False"
+                              Margin="0,5,0,0">
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="Background" Value="White"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IstVerliehen}" Value="True">
+                                        <Setter Property="Background" Value="#FFFFC0C0"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IstReserviert}" Value="True">
+                                        <Setter Property="Background" Value="#FFFFFFC0"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Titel" Binding="{Binding Titel}" Width="*" />
+                            <DataGridTextColumn Header="Autor" Binding="{Binding AutorRegisseurHersteller}" Width="*" />
+                            <DataGridTextColumn Header="Verlag" Binding="{Binding Verlag}" Width="*" />
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="*" />
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*" />
+
+                            <DataGridTextColumn Header="Verliehen an" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Setter Property="Text" Value="{Binding VerliehenAn}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Value="True"
+                                                         Binding="{Binding DataContext.IsBibliothekar,
+                                                                           RelativeSource={RelativeSource AncestorType=Window}}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <DataGridTextColumn Header="Verliehen am" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Setter Property="Text"
+                                                Value="{Binding VerliehenAm, StringFormat={}{0:dd.MM.yyyy HH:mm}}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Value="True"
+                                                         Binding="{Binding DataContext.IsBibliothekar,
+                                                                           RelativeSource={RelativeSource AncestorType=Window}}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <DataGridTemplateColumn Header="Aktionen" Width="2*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Content="Verleihen / Zurück"
+                                                    Margin="0,0,5,0"
+                                                    Padding="5,0"
+                                                    Command="{Binding DataContext.ToggleVerliehenCommand,
+                                                                      RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding DataContext.CurrentUserRole,
+                                                                                             RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                         Value="Gast">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+
+                                            <Button Content="Reservieren / Freigeben"
+                                                    Padding="5,0"
+                                                    Command="{Binding DataContext.ToggleReserviertCommand,
+                                                                      RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+
+                <!-- TAB: DVDs -->
+                <TabItem Header="DVDs">
+                    <DataGrid ItemsSource="{Binding GefilterteDvds}"
+                              SelectedItem="{Binding SelectedMediumToRemove, Mode=TwoWay}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              CanUserAddRows="False"
+                              Margin="0,5,0,0">
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="Background" Value="White"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IstVerliehen}" Value="True">
+                                        <Setter Property="Background" Value="#FFFFC0C0"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IstReserviert}" Value="True">
+                                        <Setter Property="Background" Value="#FFFFFFC0"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Titel" Binding="{Binding Titel}" Width="*" />
+                            <DataGridTextColumn Header="Regisseur" Binding="{Binding AutorRegisseurHersteller}" Width="*" />
+                            <DataGridTextColumn Header="Dauer (min)" Binding="{Binding Dauer}" Width="*" />
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="*" />
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*" />
+
+                            <DataGridTextColumn Header="Verliehen an" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Setter Property="Text" Value="{Binding VerliehenAn}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Value="True"
+                                                         Binding="{Binding DataContext.IsBibliothekar,
+                                                                           RelativeSource={RelativeSource AncestorType=Window}}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <DataGridTextColumn Header="Verliehen am" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Setter Property="Text"
+                                                Value="{Binding VerliehenAm, StringFormat={}{0:dd.MM.yyyy HH:mm}}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Value="True"
+                                                         Binding="{Binding DataContext.IsBibliothekar,
+                                                                           RelativeSource={RelativeSource AncestorType=Window}}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <DataGridTemplateColumn Header="Aktionen" Width="2*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Content="Verleihen / Zurück"
+                                                    Margin="0,0,5,0"
+                                                    Padding="5,0"
+                                                    Command="{Binding DataContext.ToggleVerliehenCommand,
+                                                                      RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding DataContext.CurrentUserRole,
+                                                                                             RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                         Value="Gast">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+
+                                            <Button Content="Reservieren / Freigeben"
+                                                    Padding="5,0"
+                                                    Command="{Binding DataContext.ToggleReserviertCommand,
+                                                                      RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+
+                <!-- TAB: Software -->
+                <TabItem Header="Software">
+                    <DataGrid ItemsSource="{Binding GefilterteSoftware}"
+                              SelectedItem="{Binding SelectedMediumToRemove, Mode=TwoWay}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              CanUserAddRows="False"
+                              Margin="0,5,0,0">
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="Background" Value="White"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IstVerliehen}" Value="True">
+                                        <Setter Property="Background" Value="#FFFFC0C0"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IstReserviert}" Value="True">
+                                        <Setter Property="Background" Value="#FFFFFFC0"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Titel" Binding="{Binding Titel}" Width="*" />
+                            <DataGridTextColumn Header="Hersteller" Binding="{Binding AutorRegisseurHersteller}" Width="*" />
+                            <DataGridTextColumn Header="Betriebssystem" Binding="{Binding Betriebssystem}" Width="*" />
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="*" />
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*" />
+
+                            <DataGridTextColumn Header="Verliehen an" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Setter Property="Text" Value="{Binding VerliehenAn}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Value="True"
+                                                         Binding="{Binding DataContext.IsBibliothekar,
+                                                                           RelativeSource={RelativeSource AncestorType=Window}}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <DataGridTextColumn Header="Verliehen am" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Setter Property="Text"
+                                                Value="{Binding VerliehenAm, StringFormat={}{0:dd.MM.yyyy HH:mm}}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Value="True"
+                                                         Binding="{Binding DataContext.IsBibliothekar,
+                                                                           RelativeSource={RelativeSource AncestorType=Window}}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <DataGridTemplateColumn Header="Aktionen" Width="2*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Content="Verleihen / Zurück"
+                                                    Margin="0,0,5,0"
+                                                    Padding="5,0"
+                                                    Command="{Binding DataContext.ToggleVerliehenCommand,
+                                                                      RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding DataContext.CurrentUserRole,
+                                                                                             RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                         Value="Gast">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+
+                                            <Button Content="Reservieren / Freigeben"
+                                                    Padding="5,0"
+                                                    Command="{Binding DataContext.ToggleReserviertCommand,
+                                                                      RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+            </TabControl>
+        </GroupBox>
+    </Grid>
+</Window>

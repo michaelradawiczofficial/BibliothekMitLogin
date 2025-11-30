@@ -1,0 +1,81 @@
+############
+# Build-Ergebnisse (.NET / C#)
+############
+
+# Standard-Buildordner
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+
+# Publish-Ordner
+**/publish/
+**/Publish/
+
+############
+# Visual Studio
+############
+
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+############
+# NuGet
+############
+
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+project.lock.json
+project.assets.json
+*.nuget.props
+*.nuget.targets
+
+############
+# Logs & Temp
+############
+
+*.log
+*.tmp
+*.temp
+*.old
+*.bak
+*.dmp
+
+############
+# ReSharper / Rider
+############
+
+_ReSharper*/
+*.DotSettings.user
+.idea/
+
+############
+# VS Code
+############
+
+.vscode/
+
+############
+# CSV / JSON -> Standardmäßig ignorieren (aber AUSNAHMEN erlauben)
+############
+
+# Globale Regeln:
+*.csv
+*.json
+
+# AUSNAHMEN: Diese Dateien sollen getrackt werden
+!Benutzer.json
+!medien.csv
+
+############
+# Editor Backup Files
+############
+
+*~
+*.swp
+*.swo
