@@ -118,7 +118,7 @@
             <Setter Property="Padding" Value="4,2" />
         </Style>
 
-        <!-- ComboBox: überarbeiteter Style mit gut lesbarer Auswahl -->
+        <!-- ComboBox: wie im UserManagementWindow, mit dunklem Hover -->
         <Style TargetType="ComboBox">
             <Setter Property="Foreground" Value="{StaticResource LibText}" />
             <Setter Property="Background" Value="#0F172A" />
@@ -127,22 +127,24 @@
             <Setter Property="FontFamily" Value="Segoe UI" />
             <Setter Property="Padding" Value="4,2" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
 
-            <!-- Items im Dropdown -->
+            <!-- Dropdown-Items -->
             <Setter Property="ItemContainerStyle">
                 <Setter.Value>
                     <Style TargetType="ComboBoxItem">
                         <Setter Property="Foreground" Value="{StaticResource LibText}" />
                         <Setter Property="Background" Value="#020617" />
-                        <Setter Property="Padding" Value="4,2" />
+                        <Setter Property="Padding" Value="6,3" />
                         <Style.Triggers>
                             <!-- Hover im Dropdown -->
                             <Trigger Property="IsHighlighted" Value="True">
-                                <Setter Property="Background" Value="#111827" />
+                                <Setter Property="Background" Value="#1E293B" />
                             </Trigger>
                             <!-- Ausgewähltes Item -->
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="#1E293B" />
+                                <Setter Property="Background" Value="#1E40AF" />
                                 <Setter Property="Foreground" Value="{StaticResource LibText}" />
                             </Trigger>
                         </Style.Triggers>
@@ -150,15 +152,97 @@
                 </Setter.Value>
             </Setter>
 
-            <!-- Rahmen bei Fokus/Hover -->
-            <Style.Triggers>
-                <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                    <Setter Property="BorderBrush" Value="{StaticResource LibAccent}" />
-                </Trigger>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush" Value="{StaticResource LibAccentSoft}" />
-                </Trigger>
-            </Style.Triggers>
+            <!-- Template mit dunklem Hover, wie in UserManagement -->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <!-- Feld mit Text + Pfeil -->
+                            <Border x:Name="Border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="4">
+                                <Grid>
+                                    <ContentPresenter Margin="8,2,24,2"
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Left"
+                                                      Content="{TemplateBinding SelectionBoxItem}"
+                                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                      RecognizesAccessKey="True" />
+                                    <Path x:Name="Arrow"
+                                          HorizontalAlignment="Right"
+                                          VerticalAlignment="Center"
+                                          Margin="0,0,8,0"
+                                          Data="M 0 0 L 4 4 L 8 0 Z"
+                                          Fill="{StaticResource LibSubText}" />
+                                </Grid>
+                            </Border>
+
+                            <!-- unsichtbare Klickfläche -->
+                            <ToggleButton x:Name="ToggleButton"
+                                          Background="Transparent"
+                                          BorderThickness="0"
+                                          Focusable="False"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          ClickMode="Press" />
+
+                            <!-- Popup mit Liste -->
+                            <Popup x:Name="Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Fade">
+                                <Grid Margin="0,2,0,0">
+                                    <Border Background="#020617"
+                                            BorderBrush="{StaticResource LibCardBorder}"
+                                            BorderThickness="1"
+                                            CornerRadius="4"
+                                            SnapsToDevicePixels="True">
+                                        <ScrollViewer Margin="0"
+                                                      SnapsToDevicePixels="True">
+                                            <StackPanel IsItemsHost="True"
+                                                        KeyboardNavigation.DirectionalNavigation="Contained" />
+                                        </ScrollViewer>
+                                    </Border>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+
+                        <!-- States -->
+                        <ControlTemplate.Triggers>
+                            <!-- Disabled -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="#111827" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#1F2937" />
+                                <Setter Property="Foreground" Value="#4B5563" />
+                                <Setter TargetName="Arrow" Property="Fill" Value="#4B5563" />
+                            </Trigger>
+
+                            <!-- MouseOver (dunkel, damit Text gut lesbar bleibt) -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource LibAccentSoft}" />
+                                <Setter TargetName="Border" Property="Background" Value="#081020" />
+                                <Setter TargetName="Arrow" Property="Fill" Value="{StaticResource LibAccentSoft}" />
+                            </Trigger>
+
+                            <!-- Tastaturfokus -->
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource LibAccent}" />
+                                <Setter TargetName="Border" Property="Background" Value="#16213A" />
+                                <Setter TargetName="Arrow" Property="Fill" Value="{StaticResource LibAccentSoft}" />
+                            </Trigger>
+
+                            <!-- Geöffnet -->
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource LibAccent}" />
+                                <Setter TargetName="Border" Property="Background" Value="#111827" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <!-- TabControl / TabItem -->
@@ -527,14 +611,13 @@
 
             <!-- GridSplitter: dunkler, passend zum Layout -->
             <GridSplitter Grid.Column="1"
-              Width="5"
-              Background="#020617"
-              BorderBrush="{StaticResource LibCardBorder}"
-              HorizontalAlignment="Center"
-              VerticalAlignment="Stretch"
-              ResizeBehavior="PreviousAndNext"
-              ShowsPreview="True" />
-
+                          Width="5"
+                          Background="#020617"
+                          BorderBrush="{StaticResource LibCardBorder}"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Stretch"
+                          ResizeBehavior="PreviousAndNext"
+                          ShowsPreview="True" />
 
             <!-- Rechte Seite: Medienübersicht -->
             <GroupBox Header="Medienübersicht" Grid.Column="2" Padding="10">

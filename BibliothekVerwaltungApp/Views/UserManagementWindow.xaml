@@ -8,8 +8,254 @@
         Height="450"
         Width="800"
         WindowStartupLocation="CenterOwner"
-        ResizeMode="CanResize">
+        ResizeMode="CanResize"
+        Background="#070B17">
 
+    <Window.Resources>
+        <!-- Farbpalette (wie MainWindow/LoginWindow) -->
+        <SolidColorBrush x:Key="LibCardBackground" Color="#0B1220" />
+        <SolidColorBrush x:Key="LibCardBorder"    Color="#1F2937" />
+        <SolidColorBrush x:Key="LibAccent"        Color="#3B82F6" />
+        <SolidColorBrush x:Key="LibAccentSoft"    Color="#60A5FA" />
+        <SolidColorBrush x:Key="LibAccentMuted"   Color="#1D4ED8" />
+        <SolidColorBrush x:Key="LibText"          Color="#E5E7EB" />
+        <SolidColorBrush x:Key="LibSubText"       Color="#9CA3AF" />
+        <SolidColorBrush x:Key="LibInputBackground" Color="#020617" />
+        <SolidColorBrush x:Key="LibInputBorder"     Color="#1F2937" />
+        <SolidColorBrush x:Key="LibDanger"        Color="#B91C1C" />
+        <SolidColorBrush x:Key="LibDangerBorder"  Color="#F97373" />
+
+        <!-- Basis-Text -->
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource LibText}" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+        </Style>
+
+        <!-- GroupBox -->
+        <Style TargetType="GroupBox">
+            <Setter Property="Background" Value="{StaticResource LibCardBackground}" />
+            <Setter Property="BorderBrush" Value="{StaticResource LibCardBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{StaticResource LibText}" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Padding" Value="5" />
+        </Style>
+
+        <!-- TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Foreground" Value="{StaticResource LibText}" />
+            <Setter Property="Background" Value="{StaticResource LibInputBackground}" />
+            <Setter Property="BorderBrush" Value="{StaticResource LibInputBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Padding" Value="4,2" />
+        </Style>
+
+        <!-- ComboBox: Variante B – modernes Dark-Theme -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Foreground" Value="{StaticResource LibText}" />
+            <Setter Property="Background" Value="#0F172A" />
+            <Setter Property="BorderBrush" Value="{StaticResource LibInputBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="4,2" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+
+            <!-- Dropdown-Items -->
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Foreground" Value="{StaticResource LibText}" />
+                        <Setter Property="Background" Value="#020617" />
+                        <Setter Property="Padding" Value="6,3" />
+                        <Style.Triggers>
+                            <!-- Hover auf Item -->
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter Property="Background" Value="#1E293B" />
+                            </Trigger>
+                            <!-- Ausgewähltes Item -->
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#1E40AF" />
+                                <Setter Property="Foreground" Value="{StaticResource LibText}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+
+            <!-- Moderner Template-Look -->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <!-- Feld mit Text + Pfeil -->
+                            <Border x:Name="Border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="4">
+                                <Grid>
+                                    <ContentPresenter Margin="8,2,24,2"
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Left"
+                                                      Content="{TemplateBinding SelectionBoxItem}"
+                                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                      RecognizesAccessKey="True" />
+                                    <Path x:Name="Arrow"
+                                          HorizontalAlignment="Right"
+                                          VerticalAlignment="Center"
+                                          Margin="0,0,8,0"
+                                          Data="M 0 0 L 4 4 L 8 0 Z"
+                                          Fill="{StaticResource LibSubText}" />
+                                </Grid>
+                            </Border>
+
+                            <!-- unsichtbare Klickfläche -->
+                            <ToggleButton x:Name="ToggleButton"
+                                          Background="Transparent"
+                                          BorderThickness="0"
+                                          Focusable="False"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          ClickMode="Press" />
+
+                            <!-- Popup mit Liste -->
+                            <Popup x:Name="Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Fade">
+                                <Grid Margin="0,2,0,0">
+                                    <Border Background="#020617"
+                                            BorderBrush="{StaticResource LibCardBorder}"
+                                            BorderThickness="1"
+                                            CornerRadius="4"
+                                            SnapsToDevicePixels="True">
+                                        <ScrollViewer Margin="0"
+                                                      SnapsToDevicePixels="True">
+                                            <StackPanel IsItemsHost="True"
+                                                        KeyboardNavigation.DirectionalNavigation="Contained" />
+                                        </ScrollViewer>
+                                    </Border>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+
+                        <!-- States -->
+                        <ControlTemplate.Triggers>
+                            <!-- Disabled -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="#111827" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#1F2937" />
+                                <Setter Property="Foreground" Value="#4B5563" />
+                                <Setter TargetName="Arrow" Property="Fill" Value="#4B5563" />
+                            </Trigger>
+
+                            <!-- MouseOver (dunkler, damit Text gut lesbar bleibt) -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource LibAccentSoft}" />
+                                <Setter TargetName="Border" Property="Background" Value="#081020" />
+                                <Setter TargetName="Arrow" Property="Fill" Value="{StaticResource LibAccentSoft}" />
+                            </Trigger>
+
+                            <!-- Tastaturfokus -->
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource LibAccent}" />
+                                <Setter TargetName="Border" Property="Background" Value="#16213A" />
+                                <Setter TargetName="Arrow" Property="Fill" Value="{StaticResource LibAccentSoft}" />
+                            </Trigger>
+
+                            <!-- Geöffnet -->
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource LibAccent}" />
+                                <Setter TargetName="Border" Property="Background" Value="#111827" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Standard-Button -->
+        <Style TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource LibText}" />
+            <Setter Property="Background" Value="{StaticResource LibAccentMuted}" />
+            <Setter Property="BorderBrush" Value="{StaticResource LibAccentSoft}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Padding" Value="8,3" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource LibAccent}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#0B1120" />
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource LibAccent}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Background" Value="#111827" />
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#1F2937" />
+                                <Setter Property="Foreground" Value="#4B5563" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Danger-Button -->
+        <Style x:Key="DangerButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="{StaticResource LibDanger}" />
+            <Setter Property="BorderBrush" Value="{StaticResource LibDangerBorder}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <!-- ListBox -->
+        <Style TargetType="ListBox">
+            <Setter Property="Background" Value="{StaticResource LibInputBackground}" />
+            <Setter Property="BorderBrush" Value="{StaticResource LibCardBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{StaticResource LibText}" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+        </Style>
+
+        <!-- ListBoxItem -->
+        <Style TargetType="ListBoxItem">
+            <Setter Property="Foreground" Value="{StaticResource LibText}" />
+            <Setter Property="Padding" Value="4,2" />
+            <Setter Property="Background" Value="Transparent" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#111827" />
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#1E293B" />
+                    <Setter Property="Foreground" Value="{StaticResource LibText}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <!-- LAYOUT -->
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -21,7 +267,7 @@
         <TextBlock Grid.Row="0"
                    Text="Benutzerverwaltung"
                    FontSize="18"
-                   FontWeight="Bold"
+                   FontWeight="SemiBold"
                    Margin="0,0,0,10" />
 
         <!-- Inhalt -->
@@ -39,11 +285,12 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Suchfeld (ohne Watermark) -->
+                    <!-- Suchfeld -->
                     <StackPanel Grid.Row="0" Orientation="Vertical" Margin="0,0,0,5">
                         <TextBlock Text="Suche (Name/Rolle):"
-                                   Margin="0,0,0,2"/>
-                        <TextBox Width="200"
+                                   Margin="0,0,0,2"
+                                   Foreground="{StaticResource LibSubText}"/>
+                        <TextBox Width="220"
                                  HorizontalAlignment="Left"
                                  Text="{Binding Suchtext, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
@@ -59,7 +306,6 @@
             <GroupBox Header="Details" Grid.Column="1">
                 <Grid Margin="5">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -107,7 +353,7 @@
                     <TextBlock Grid.Row="3"
                                Grid.ColumnSpan="3"
                                Margin="0,5,0,0"
-                               Foreground="Gray"
+                               Foreground="{StaticResource LibSubText}"
                                FontStyle="Italic"
                                TextWrapping="Wrap"
                                Text="Hinweis: Leeres Passwortfeld bedeutet, dass das bestehende Passwort unverändert bleibt. 'Passwort setzen' überschreibt das Passwort." />
@@ -131,6 +377,7 @@
             <Button Content="Löschen"
                     Width="90"
                     Margin="0,0,10,0"
+                    Style="{StaticResource DangerButtonStyle}"
                     Command="{Binding LoeschenBenutzerCommand}" />
             <Button Content="Passwort setzen"
                     Width="120"
