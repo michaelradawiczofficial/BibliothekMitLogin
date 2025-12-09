@@ -11,11 +11,5 @@ namespace BibliothekVerwaltungApp
 			// das überschreibt die vom App-Startup gesetzte Instanz.
 			// DataContext wird in App.OnStartup gesetzt.
 		}
-
-		// NEU: Handler für den "Beenden"-Button
-		private void BeendenButton_Click(object sender, RoutedEventArgs e)
-		{
-			Application.Current.Shutdown();
-		}
 	}
 }

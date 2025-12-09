@@ -1,161 +1,157 @@
-📚 BibliothekMitLogin
+# 📚 BibliothekVerwaltungApp – WPF Anwendung mit Login & Benutzerverwaltung
 
-Ein einfaches Bibliotheksverwaltungssystem mit Login, Benutzerverwaltung und Medienverwaltung.
-Erstellt als Lernprojekt in C# / .NET mit WPF-Oberfläche.
+Dieses Projekt ist eine **Desktop-Anwendung** in C# (WPF), die den **Login-Prozess**, die **Benutzerverwaltung** und ein **Rollenmodell** für eine Bibliothek simuliert.  
+Es entstand während meiner **Umschulung zum Fachinformatiker Anwendungsentwicklung** und zeigt, wie ich **Benutzerverwaltung, Passwortlogik und Software-Architektur** praktisch umgesetzt habe.
 
-🚀 Features
+Ziel ist eine leicht verständliche Anwendung, die interne Abläufe einer Bibliothek vereinfacht darstellt und zeigt, wie **Daten, Benutzerinteraktionen und Geschäftslogik** zusammengeführt werden.
 
-🔐 Login-System mit Benutzerverwaltung
+---
 
-📖 Medienverwaltung (CSV-Datei)
+## 🎯 Ziel des Projekts
 
-➕ Automatische Neuerstellung von benutzer.json, falls sie fehlt
+Das Projekt wurde entwickelt, um **die Kernanforderungen einer einfachen Verwaltungssoftware** abzubilden:
 
-🖥️ WPF-Frontend (Windows)
+- Zugang über einen **Login-Dialog**
+- Verwaltung von **Benutzerkonten**
+- Vergabe von **Benutzerrollen** (z.B. Standard / Administrator)
+- **Passwortverwaltung**
+- Übersicht über bestehende Benutzerkonten
+- **Suchfunktionen** und Filter
+- Sicheres Speichern von Änderungen
 
-🔧 Klare Trennung von App-Logik (BibliothekVerwaltung.Core) und UI (BibliothekVerwaltungApp)
+Das Projekt zeigt in kompakter Form, wie **Authentifizierung, Berechtigungen und Verwaltung** zueinander passen.
 
-📂 Projektstruktur
-BibliothekMitLogin/
-│
-├── BibliothekVerwaltung.Core/      → Geschäftslogik
-├── BibliothekVerwaltungApp/        → WPF Benutzeroberfläche
-├── benutzer.json                   → Test-Benutzerdaten (wird automatisch neu erzeugt)
-├── medien.csv                      → Test-Mediendaten
-└── README.md
+---
 
-🧩 Voraussetzungen
+## 🧑‍💻 Funktionsumfang (einfach erklärt)
 
-Das Projekt benötigt folgende Umgebung:
+- **Login mit Benutzername & Passwort**
+- **Benutzerlisten anzeigen**
+- **Benutzer anlegen, bearbeiten, löschen**
+- Vergabe von **Rollen** (z. B. Admin / User)
+- **Passwort neu setzen**
+- Suchfunktion zum schnellen Finden von Benutzern
+- **Validierung** von Eingaben (Pflichtfelder etc.)
+- **Dialogfenster** zur Bestätigung sensibler Aktionen
+- visuelles Feedback bei Änderungen
 
-Betriebssystem	Unterstützt	Besonderheiten
-Windows 11	✔️ Ja	WPF funktioniert vollständig
-macOS	⚠️ Nur CLI	WPF funktioniert nicht (GUI nicht startbar)
-Linux	⚠️ Nur CLI	WPF funktioniert nicht (GUI nicht startbar)
-❗ Wichtig
+Die Abläufe sind realitätsnah aufgebaut, aber bewusst kompakt, damit der Fokus auf der **Struktur** und dem **sauberen Code** liegt.
 
-Die grafische Oberfläche (WPF) läuft nur unter Windows.
-Auf macOS und Linux kann lediglich das Core-Projekt (BibliothekVerwaltung.Core) ausgeführt oder getestet werden.
+---
 
-🛠️ Installation & Start
-🔵 Windows 11 (WPF lauffähig)
-1. .NET Desktop Runtime installieren
+## 🏛️ Aufbau der Anwendung
 
-Lade die .NET 9 Desktop Runtime herunter:
+Die Lösung basiert auf einer **klassischen MVVM-Struktur**, wie sie im professionellen .NET-Umfeld üblich ist:
 
-➡️ https://dotnet.microsoft.com/en-us/download/dotnet/9.0
+- **Views**  
+  Gestaltung der UI (Login-Fenster, Benutzerverwaltung)
 
-Installieren:
+- **ViewModels**  
+  Logik für Benutzerverwaltung, Befehle, Bindings
 
-.NET Runtime (Konsole)
+- **Core / Models**  
+  Datenmodelle und Rollenlogik
 
-.NET Desktop Runtime (für WPF)
+- **Repository**  
+  Zugriff auf Benutzerdaten (CRUD Funktionen)
 
-2. Repository klonen
-git clone https://github.com/DEIN-USERNAME/DEIN-REPO.git
-cd BibliothekMitLogin
+- **Services**  
+  Dialogservice für Bestätigungen und Benachrichtigungen
 
-3. Start der WPF-App
-cd BibliothekVerwaltungApp
-dotnet build
-dotnet run
+Damit wird gezeigt, dass ich **Trennung von Benutzeroberfläche, Logik und Daten** verstanden und angewendet habe.
 
+---
 
-Oder alternativ über Visual Studio:
-→ Projektmappe öffnen → Starten (F5).
+## 🧠 Was ich dabei gelernt habe
 
-🟠 macOS (nur Core, kein WPF)
-1. .NET Runtime installieren
-brew install dotnet
+Bei diesem Projekt habe ich mich intensiv mit folgenden Themen beschäftigt:
 
+### Software-Architektur
+- **MVVM-Pattern** verstehen und anwenden
+- Datenbindungs-Mechanismen (Bindings)
+- **Command-Struktur** für Benutzeraktionen
+- **Repository-Konzept** für die Datenverwaltung
 
-oder manuell von Microsoft downloaden.
+### Anwendungsentwicklung
+- Login-Prozess mit Eingabeprüfung
+- Verwaltung von Benutzerrollen
+- sichere Bedienlogik mit Bestätigungsdialogen
+- **Validierung von Eingaben**
+- Umgang mit **ObservableCollection** (dynamische UI-Listen)
 
-2. Core-Projekt starten
-cd BibliothekMitLogin/BibliothekVerwaltung.Core
-dotnet run
+### Arbeitsweise
+- strukturierte Planung und Umsetzung
+- Aufteilen einer Aufgabenstellung in einzelne Funktionen
+- Dokumentation und Kommentare im Code
+- Fokus auf **saubere Lesbarkeit** und **Wartbarkeit**
 
+---
 
-⚠️ Die WPF-App lässt sich unter macOS nicht starten.
-Nur Logik & Tests sind nutzbar.
+## 🖥️ Start der Anwendung
 
-🟢 Linux (nur Core, kein WPF)
-1. .NET installieren (Ubuntu Beispiel)
-sudo apt update
-sudo apt install dotnet-sdk-9.0
+Zum Starten der Anwendung:
 
-2. Core-Projekt starten
-cd BibliothekMitLogin/BibliothekVerwaltung.Core
-dotnet run
+1. Projekt entpacken
+2. Solution öffnen:
+BibliothekVerwaltungApp.sln
+3. Projekt ausführen in Visual Studio
 
+Das Projekt benötigt nur:
+- .NET und WPF (fertig in Visual Studio integriert)
+---
 
-⚠️ WPF ist Windows-exklusiv.
+## 📂 Testdaten für Benutzer und Medien
 
-🧾 Umgang mit benutzer.json
+Im Projekt liegen **fertige Testdaten**, damit die Anwendung sofort genutzt werden kann, ohne selbst Benutzer oder Medien anlegen zu müssen.
 
-Die Datei benutzer.json enthält Test-Benutzerkonten und wird beim Start automatisch neu erstellt, wenn sie nicht vorhanden ist.
+Diese Daten befinden sich im Ordner:
+/BibliothekMitLogin/TestDateien
 
-❗ Wenn die Datei fehlerhaft ist oder Login nicht funktioniert
+markdown
+Code kopieren
 
-Du kannst sie einfach löschen.
+Enthalten sind:
+- `Benutzer.json` → Beispielbenutzer (inkl. Admin)
+- `medien.csv` → Beispielliste von Büchern/Medien
 
-📌 Speicherorte
+Damit die Anwendung diese Daten nutzen kann, müssen sie in den Datenordner der Software kopiert werden.  
+Beim ersten Start erzeugt die Anwendung diesen Ordner automatisch:
 
-Standardmäßig liegt sie im Projektordner:
+/Data
 
-BibliothekMitLogin/BibliothekVerwaltungApp/bin/Debug/net9.0-windows/Data/Benutzer.json
-Analog soll die Test medien.csv hier hin.
+markdown
+Code kopieren
 
-🔧 So setzt du sie zurück
+**Vorgehen:**
+1. Anwendung einmal starten  
+   → der Ordner `Data` wird angelegt  
+2. Beide Dateien aus `/TestDateien` in den Ordner `Data` kopieren:
+   - `Benutzer.json` → `/Data/Benutzer.json`
+   - `medien.csv` → `/Data/medien.csv`
 
-Anwendung schließen
+Beim nächsten Start lädt die Anwendung diese **Beispieldaten automatisch**, und alle Funktionen (Login, Suche, Reservieren) sind sofort nutzbar.
 
-Datei löschen:
+---
 
-rm Benutzer.json
+## 📌 Warum dieses Projekt wichtig ist
 
+Dieses Projekt zeigt im Kleinen die **Kernaufgaben eines Fachinformatikers Anwendungsentwicklung**:
 
-oder unter Windows:
+- Verständnis von **Benutzern**, **Rollen** und **Berechtigungen**
+- Entwickeln einer **GUI**, die intuitiv bedienbar ist
+- **fehlertolerante Verarbeitung** von Eingaben
+- **saubere Code-Struktur**
+- **dokumentierte Architektur-Entscheidungen**
 
-del Benutzer.json
+Es zeigt nicht nur, **dass ich programmieren kann**, sondern auch,
+**wie ich Software konzipiere und strukturiere**.
 
+Das Projekt war ein **wichtiger Schritt**, um vom reinen Code-Schreiben hin zur **professionellen Softwareentwicklung** zu kommen.
 
-Anwendung neu starten
-→ Die Datei wird automatisch neu generiert mit Standardbenutzern.
+---
 
-📁 Umgang mit medien.csv
+## ✍️ Autor
 
-Die Datei enthält Testmedien.
-Sie bleibt unverändert erhalten und wird nicht automatisch neu erstellt.
-
-Falls sie fehlt, muss sie manuell wieder eingefügt werden.
-
-🧪 Beispiel-Testdaten
-👤 Standard-Benutzer (beim Neu-Erstellen)
-{
-  "Benutzer": [
-    {
-      "Benutzername": "admin",
-      "Passwort": "admin"
-    }
-  ]
-}
-
-📚 Beispiel Medien (medien.csv)
-ID;Titel;Autor;Jahr
-1;Der Hobbit;J.R.R. Tolkien;1937
-2;Clean Code;Robert C. Martin;2008
-
-🛡️ Hinweise zur Versionierung
-
-Diese Dateien werden bewusst versioniert (Testzwecke):
-
-Benutzer.json
-
-medien.csv
-
-Die .gitignore ist angepasst, sodass sie nicht versehentlich ausgeschlossen werden.
-
-💬 Support
-
-Bei Rückfragen oder Problemen einfach melden – ich helfe dir gerne weiter.
+**Michael Radawicz**  
+Umschulung zum Fachinformatiker Anwendungsentwicklung  
+Projekt: GUI-gestützte Benutzerverwaltung mit Login & Rollenmodell
