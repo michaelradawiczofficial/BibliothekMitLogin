@@ -24,7 +24,21 @@ namespace BibliothekVerwaltung.Core.Models
 
 		public Bibliothek()
 		{
-			_dataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
+			// 1. Startpunkt: Wo liegt die .exe? (z.B. ...\Projekt\bin\Debug\net6.0\)
+			string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+			// 2. Navigation: Wir gehen 3 Ebenen hoch, um aus dem 'bin'-Ordner rauszukommen.
+			// Ziel: ...\Projekt\
+			string? projectPath = Directory.GetParent(baseDirectory)?.Parent?.Parent?.Parent?.FullName;
+
+			// Fallback: Falls wir nicht navigieren können, bleiben wir im BaseDir.
+			if (string.IsNullOrEmpty(projectPath))
+			{
+				projectPath = baseDirectory;
+			}
+
+			// 3. Pfade setzen: Der Data-Ordner liegt nun im Projektverzeichnis
+			_dataDirectory = Path.Combine(projectPath, "Data");
 			_csvFilePath = Path.Combine(_dataDirectory, "medien.csv");
 
 			if (!Directory.Exists(_dataDirectory))

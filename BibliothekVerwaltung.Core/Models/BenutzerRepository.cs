@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace BibliothekVerwaltung.Core.Models
 {
@@ -24,20 +25,32 @@ namespace BibliothekVerwaltung.Core.Models
 
 		public BenutzerRepository()
 		{
-			_dataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
+			// 1. Startpunkt: Wo liegt die .exe? (z.B. ...\Projekt\bin\Debug\net6.0\)
+			string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+			// 2. Navigation: Wir gehen 3 Ebenen hoch, um aus dem 'bin'-Ordner rauszukommen.
+			// Ziel: ...\Projekt\
+			string? projectPath = Directory.GetParent(baseDirectory)?.Parent?.Parent?.Parent?.FullName;
+
+			// Fallback: Falls wir nicht navigieren können (z.B. bei installierter App), bleiben wir im BaseDir.
+			if (string.IsNullOrEmpty(projectPath))
+			{
+				projectPath = baseDirectory;
+			}
+
+			// 3. Pfade setzen: Der Data-Ordner liegt nun neben dem bin-Ordner (nicht darin).
+			_dataDirectory = Path.Combine(projectPath, "Data");
 			_jsonFilePath = Path.Combine(_dataDirectory, "Benutzer.json");
 
+			// Ordner erstellen, falls nicht vorhanden
 			if (!Directory.Exists(_dataDirectory))
 			{
 				Directory.CreateDirectory(_dataDirectory);
 			}
 
+			// Standard-Datei erstellen, falls nicht vorhanden
 			if (!File.Exists(_jsonFilePath))
 			{
-				// Wenn noch keine Datei existiert, legen wir eine Standardkonfiguration an:
-				//  - Admin: admin / admin
-				//  - Bibliothekar: bib / bib
-				//  - Gast: gast / gast
 				ErstelleStandardBenutzerDatei();
 			}
 
@@ -76,30 +89,26 @@ namespace BibliothekVerwaltung.Core.Models
 					PropertyNameCaseInsensitive = true
 				};
 
+				// WICHTIG: Damit Enums als Text ("Admin") statt Zahl (0) gelesen werden können
+				options.Converters.Add(new JsonStringEnumConverter());
+
 				var list = JsonSerializer.Deserialize<List<Benutzer>>(json, options);
 				if (list != null)
 				{
-					// Sicherstellen, dass Rolle sinnvoll gesetzt ist (für alte Dateien ohne Rolle)
 					foreach (var benutzer in list)
 					{
-						// Fallback: wenn Rolle noch Default (0) aber Name "admin" o.ä., kann man hier
-						// optional Heuristiken einbauen. Für jetzt reicht: Default = Gast.
-						// (Der Default-Wert des Enums ist BenutzerRolle.Admin, daher prüfen wir explizit nicht.)
-						// Wenn du sicherstellen willst, dass alte Benutzer Gast sind:
-						// if (...) benutzer.Rolle = BenutzerRolle.Gast;
 						if (string.IsNullOrWhiteSpace(benutzer.Benutzername))
 						{
 							benutzer.Benutzername = "unbekannt";
 						}
 					}
-
 					_benutzer.AddRange(list);
 				}
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine($"Fehler beim Laden von Benutzer.json: {ex.Message}");
-				// Wenn Laden fehlschlägt, legen wir wieder Standardbenutzer an
+				// Fallback bei defekter Datei
 				ErstelleStandardBenutzerDatei();
 			}
 		}
@@ -113,8 +122,11 @@ namespace BibliothekVerwaltung.Core.Models
 			{
 				var options = new JsonSerializerOptions
 				{
-					WriteIndented = true
+					WriteIndented = true // Formatiert das JSON lesbar
 				};
+
+				// WICHTIG: Speichert Enums als Text ("Admin")
+				options.Converters.Add(new JsonStringEnumConverter());
 
 				string json = JsonSerializer.Serialize(_benutzer, options);
 				File.WriteAllText(_jsonFilePath, json);
@@ -125,10 +137,8 @@ namespace BibliothekVerwaltung.Core.Models
 			}
 		}
 
-		/// <summary>
-		/// Fügt einen neuen Benutzer hinzu und speichert die Datei.
-		/// Wenn ein Benutzer mit gleichem Namen bereits existiert, wird eine Exception geworfen.
-		/// </summary>
+		// --- Ab hier bleiben die Methoden identisch zu deinem Original ---
+
 		public void AddBenutzer(Benutzer benutzer)
 		{
 			if (benutzer == null)
@@ -146,10 +156,6 @@ namespace BibliothekVerwaltung.Core.Models
 			SpeichereBenutzer();
 		}
 
-		/// <summary>
-		/// Aktualisiert einen bestehenden Benutzer (Rolle, Benutzername – optional).
-		/// Die Identifikation erfolgt über den ursprünglichen Namen (oldBenutzername).
-		/// </summary>
 		public void UpdateBenutzer(string oldBenutzername, Benutzer updated)
 		{
 			if (string.IsNullOrWhiteSpace(oldBenutzername))
@@ -166,7 +172,6 @@ namespace BibliothekVerwaltung.Core.Models
 				throw new InvalidOperationException($"Kein Benutzer mit dem Namen '{oldBenutzername}' gefunden.");
 			}
 
-			// Wenn der Name geändert wird, prüfen, ob es den neuen schon gibt
 			if (!string.Equals(oldBenutzername, updated.Benutzername, StringComparison.OrdinalIgnoreCase) &&
 				_benutzer.Any(b => string.Equals(b.Benutzername, updated.Benutzername, StringComparison.OrdinalIgnoreCase)))
 			{
@@ -179,9 +184,6 @@ namespace BibliothekVerwaltung.Core.Models
 			SpeichereBenutzer();
 		}
 
-		/// <summary>
-		/// Ändert das Passwort eines Benutzers und speichert die Datei.
-		/// </summary>
 		public void ChangePasswort(string benutzername, string neuesPasswort)
 		{
 			if (string.IsNullOrWhiteSpace(benutzername))
@@ -202,9 +204,6 @@ namespace BibliothekVerwaltung.Core.Models
 			SpeichereBenutzer();
 		}
 
-		/// <summary>
-		/// Entfernt einen Benutzer (sofern vorhanden) und speichert die Datei.
-		/// </summary>
 		public void RemoveBenutzer(string benutzername)
 		{
 			if (string.IsNullOrWhiteSpace(benutzername))
@@ -220,9 +219,6 @@ namespace BibliothekVerwaltung.Core.Models
 			}
 		}
 
-		/// <summary>
-		/// Sucht einen Benutzer anhand seines Namens.
-		/// </summary>
 		public Benutzer? FindByName(string benutzername)
 		{
 			if (string.IsNullOrWhiteSpace(benutzername))
@@ -232,10 +228,6 @@ namespace BibliothekVerwaltung.Core.Models
 				.FirstOrDefault(b => string.Equals(b.Benutzername, benutzername, StringComparison.OrdinalIgnoreCase));
 		}
 
-		/// <summary>
-		/// Authentifiziert einen Benutzer anhand Name und Passwort.
-		/// Gibt den Benutzer zurück oder null, falls die Daten ungültig sind.
-		/// </summary>
 		public Benutzer? Authenticate(string benutzername, string passwort)
 		{
 			if (string.IsNullOrWhiteSpace(benutzername) || string.IsNullOrWhiteSpace(passwort))
@@ -246,9 +238,6 @@ namespace BibliothekVerwaltung.Core.Models
 				string.Equals(b.Passwort, passwort));
 		}
 
-		/// <summary>
-		/// Versucht, einen Benutzer zu authentifizieren.
-		/// </summary>
 		public bool TryAuthenticate(string benutzername, string passwort, out Benutzer? benutzer)
 		{
 			benutzer = Authenticate(benutzername, passwort);

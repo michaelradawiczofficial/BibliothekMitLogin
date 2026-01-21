@@ -5,6 +5,7 @@
 # Standard-Buildordner
 bin/
 obj/
+Data/
 [Bb]in/
 [Oo]bj/
 

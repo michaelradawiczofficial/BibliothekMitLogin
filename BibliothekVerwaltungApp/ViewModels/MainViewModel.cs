@@ -50,15 +50,15 @@ namespace BibliothekVerwaltungApp.ViewModels
 		public bool IstAdmin => AktuellerBenutzer?.Rolle == BenutzerRolle.Admin;
 
 		// --- alte Rollen-Enum für bestehende XAML-Logik (Tabsichtbarkeit) ---
-		private UserRole _currentUserRole;
-		public ObservableCollection<UserRole> AvailableRoles { get; }
+		private BenutzerRolle _currentBenutzerRolle;
+		public ObservableCollection<BenutzerRolle> AvailableRoles { get; }
 
-		public UserRole CurrentUserRole
+		public BenutzerRolle CurrentBenutzerRolle
 		{
-			get => _currentUserRole;
+			get => _currentBenutzerRolle;
 			set
 			{
-				if (SetProperty(ref _currentUserRole, value))
+				if (SetProperty(ref _currentBenutzerRolle, value))
 				{
 					OnRoleChanged();
 				}
@@ -97,10 +97,10 @@ namespace BibliothekVerwaltungApp.ViewModels
 
 			// Rollen für bestehende UI (Tabsichtbarkeit). 
 			// Wird durch Login über SetAngemeldeterBenutzer gesetzt.
-			AvailableRoles = new ObservableCollection<UserRole>(
-				Enum.GetValues(typeof(UserRole)).Cast<UserRole>());
+			AvailableRoles = new ObservableCollection<BenutzerRolle>(
+				Enum.GetValues(typeof(BenutzerRolle)).Cast<BenutzerRolle>());
 
-			_currentUserRole = UserRole.Bibliothekar;
+			_currentBenutzerRolle = BenutzerRolle.Bibliothekar;
 
 			// CollectionViews
 			GefilterteMedien = CollectionViewSource.GetDefaultView(_bibliothek.AlleMedien);
@@ -157,9 +157,9 @@ namespace BibliothekVerwaltungApp.ViewModels
 
 			// Für die bestehende XAML (Tab-Sichtbarkeit) mappen wir die Rolle grob:
 			if (benutzer.Rolle == BenutzerRolle.Admin || benutzer.Rolle == BenutzerRolle.Bibliothekar)
-				CurrentUserRole = UserRole.Bibliothekar;
+				CurrentBenutzerRolle = BenutzerRolle.Bibliothekar;
 			else
-				CurrentUserRole = UserRole.Gast;
+				CurrentBenutzerRolle = BenutzerRolle.Gast;
 		}
 
 		// --- Properties für Suche ---
