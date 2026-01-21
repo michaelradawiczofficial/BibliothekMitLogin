@@ -80,26 +80,6 @@ Die Darstellung erfolgt über eine intelligente Liste (DataGrid), die je nach Me
 
 
 
-\## TECHNOLOGIE-STACK
-
-
-
-\* Framework: .NET 8.0 (Desktop)
-
-\* UI: WPF (Windows Presentation Foundation)
-
-\* Architektur: MVVM (Model-View-ViewModel)
-
-\* Datenformate: JSON (System.Text.Json), CSV
-
-\* Sprache: C# 10+
-
-
-
---------------------------------------------------------------------------------
-
-
-
 \## PROJEKTSTRUKTUR
 
 
